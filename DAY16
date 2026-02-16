@@ -1,0 +1,25 @@
+Q16)Problem: Given an array of integers, count the frequency of each distinct element and print the result.
+CODE-
+#include <stdio.h>
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    int arr[n];
+    int freq[1001] = {0};   
+
+    for(int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+        freq[arr[i]]++;
+    }
+
+    for(int i = 0; i < n; i++) {
+        if(freq[arr[i]] != 0) {
+            printf("%d:%d ", arr[i], freq[arr[i]]);
+            freq[arr[i]] = 0;   
+        }
+    }
+
+    return 0;
+}
