@@ -1,0 +1,154 @@
+q44)Problem Statement:
+Perform inorder, preorder, and postorder traversals of a given binary tree.
+
+Input Format:
+- First line contains integer N
+- Second line contains level-order traversal (-1 represents NULL)
+
+Output Format:
+- Print inorder, preorder, and postorder traversals
+
+Example:
+Input:
+7
+1 2 3 4 5 6 7
+
+Output:
+4 2 5 1 6 3 7
+1 2 4 5 3 6 7
+4 5 2 6 7 3 1
+
+  code:
+#include <stdio.h>
+#include <stdlib.h>
+
+// Tree Node
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Queue for level order build
+struct QNode {
+    struct Node* data;
+    struct QNode* next;
+};
+
+struct QNode *front = NULL, *rear = NULL;
+
+// enqueue
+void enqueue(struct Node* x) {
+    struct QNode* temp = (struct QNode*)malloc(sizeof(struct QNode));
+    temp->data = x;
+    temp->next = NULL;
+
+    if (rear == NULL) {
+        front = rear = temp;
+        return;
+    }
+
+    rear->next = temp;
+    rear = temp;
+}
+
+// dequeue
+struct Node* dequeue() {
+    if (front == NULL) return NULL;
+
+    struct QNode* temp = front;
+    struct Node* node = temp->data;
+
+    front = front->next;
+    if (front == NULL) rear = NULL;
+
+    free(temp);
+    return node;
+}
+
+// create node
+struct Node* createNode(int x) {
+    if (x == -1) return NULL;
+
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = x;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// build tree from level order
+struct Node* buildTree(int arr[], int n) {
+    if (n == 0 || arr[0] == -1) return NULL;
+
+    struct Node* root = createNode(arr[0]);
+    enqueue(root);
+
+    int i = 1;
+
+    while (i < n) {
+        struct Node* curr = dequeue();
+
+        if (i < n && arr[i] != -1) {
+            curr->left = createNode(arr[i]);
+            enqueue(curr->left);
+        }
+        i++;
+
+        if (i < n && arr[i] != -1) {
+            curr->right = createNode(arr[i]);
+            enqueue(curr->right);
+        }
+        i++;
+    }
+
+    return root;
+}
+
+// inorder
+void inorder(struct Node* root) {
+    if (root == NULL) return;
+    inorder(root->left);
+    printf("%d ", root->data);
+    inorder(root->right);
+}
+
+// preorder
+void preorder(struct Node* root) {
+    if (root == NULL) return;
+    printf("%d ", root->data);
+    preorder(root->left);
+    preorder(root->right);
+}
+
+// postorder
+void postorder(struct Node* root) {
+    if (root == NULL) return;
+    postorder(root->left);
+    postorder(root->right);
+    printf("%d ", root->data);
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+
+    int arr[n];
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    struct Node* root = buildTree(arr, n);
+
+    // inorder
+    inorder(root);
+    printf("\n");
+
+    // preorder
+    preorder(root);
+    printf("\n");
+
+    // postorder
+    postorder(root);
+
+    return 0;
+}
