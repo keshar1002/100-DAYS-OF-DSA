@@ -1,0 +1,98 @@
+q34)Problem: Evaluate Postfix Expression - Implement using linked list with dynamic memory allocation.
+
+Input:
+- Postfix expression with operands and operators
+
+Output:
+- Print the integer result
+
+Example:
+Input:
+2 3 1 * + 9 -
+
+Output:
+-4
+
+Explanation:
+Use stack to store operands, apply operators by popping operands, push result back. Final stack top is result.
+
+  code:
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
+// Stack node
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Push
+void push(struct Node** top, int x) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = x;
+    newNode->next = *top;
+    *top = newNode;
+}
+
+// Pop
+int pop(struct Node** top) {
+    if (*top == NULL) {
+        printf("Stack Underflow\n");
+        return 0;
+    }
+    struct Node* temp = *top;
+    int val = temp->data;
+    *top = temp->next;
+    free(temp);
+    return val;
+}
+
+// Evaluate postfix
+int evaluatePostfix(char* expr) {
+    struct Node* stack = NULL;
+    char* token = strtok(expr, " ");
+
+    while (token != NULL) {
+        // if number → push
+        if (isdigit(token[0]) || (token[0] == '-' && isdigit(token[1]))) {
+            push(&stack, atoi(token));
+        }
+        // operator
+        else {
+            int b = pop(&stack);
+            int a = pop(&stack);
+            int result;
+
+            switch (token[0]) {
+                case '+': result = a + b; break;
+                case '-': result = a - b; break;
+                case '*': result = a * b; break;
+                case '/': result = a / b; break;
+                default: result = 0;
+            }
+
+            push(&stack, result);
+        }
+
+        token = strtok(NULL, " ");
+    }
+
+    return pop(&stack);
+}
+
+int main() {
+    char expr[200];
+
+    // read full line
+    fgets(expr, sizeof(expr), stdin);
+
+    // remove newline
+    expr[strcspn(expr, "\n")] = '\0';
+
+    int result = evaluatePostfix(expr);
+    printf("%d\n", result);
+
+    return 0;
+}
